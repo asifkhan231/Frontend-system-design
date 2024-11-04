@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Virtualization</title>
+    <link rel="stylesheet" href="./index.css">
+    <template id="card_template">
+        <article class="card">
+            <h3 class="card__body__title"></h3>
+            <div class="card__body">
+                <div class='card__body__image'></div>
+                <section class='card__body__content' contenteditable="true">
+                </section>
+            </div>
+        </article>
+    </template>
+</head>
+<body>
+</body>
+<script type="module">
+    import {VirtualList} from "./virtual-list.js";
+    import {initMockDB} from './db.js'
+    const container = document.body;
+    const template = document.getElementById('card_template')
+    const DB = initMockDB({title: 'Frontend System Design', body: 'Learning about virtualization'})
+
+    function createOrUpdateCard(datum, element) {
+        const card = element ?? template.content.cloneNode(true).firstElementChild;
+        const [cardTitle, cardBody] = card.querySelectorAll('.card__title ,.card__body__content')
+        if (cardTitle) cardTitle.textContent = datum.title;
+        if (cardBody) cardBody.textContent = datum.body;
+        return card;
+    }
+    const list = new VirtualList(container, {
+        getPage: (p)=> DB.getPage(p),
+        getTemplate: createOrUpdateCard,
+        pageSize: 10,
+        updateTemplate: createOrUpdateCard
+    });
+    list.render();
+</script>
+</html>
